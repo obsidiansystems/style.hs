@@ -45,6 +45,24 @@ for example in a dev shell:
 Inside that shell, plain `fourmolu` already uses the Obsidian Systems style, with
 no `--config` needed.
 
+### Vendor it as a git submodule
+
+Add this repo as a submodule and symlink your project's `fourmolu.yaml` to the
+vendored one. fourmolu discovers `fourmolu.yaml` from the project root
+automatically, so editors, formatters, and CI all pick up the style with no
+flags:
+
+```sh
+git submodule add https://github.com/obsidiansystems/style.hs style.hs
+ln -s style.hs/fourmolu.yaml fourmolu.yaml
+```
+
+Pull in later changes to the shared style by updating the submodule:
+
+```sh
+git submodule update --remote style.hs
+```
+
 ### Use `fourmolu.yaml` as an executable
 
 [`fourmolu.yaml`](./fourmolu.yaml) is both the config *and* a runnable
