@@ -1,5 +1,5 @@
 #! /usr/bin/env nix
-#! nix shell github:obsidiansystems/style.hs#fourmolu --command 'fourmolu --config -'
+#! nix shell github:obsidiansystems/style.hs#fourmolu --command sh -c ``fourmolu --config "$1" "${@:2}"`` sh
 
 indentation: 2
 column-limit: none
