@@ -7,8 +7,7 @@ pkgs.writeShellScriptBin "fourmolu" ''
   baseConfig=${./fourmolu.yaml}
 
   # Forward all arguments to fourmolu, but intercept `--config -`: when it is
-  # given, the config read from stdin is appended to our base config and the
-  # combined result is passed to fourmolu instead.
+  # given, the config is read from stdin.
   args=()
   useStdinConfig=
   while [ "$#" -gt 0 ]; do
@@ -24,7 +23,7 @@ pkgs.writeShellScriptBin "fourmolu" ''
   if [ -n "$useStdinConfig" ]; then
     config=$(${pkgs.coreutils}/bin/mktemp)
     trap '${pkgs.coreutils}/bin/rm -f "$config"' EXIT
-    ${pkgs.coreutils}/bin/cat "$baseConfig" - > "$config"
+    ${pkgs.coreutils}/bin/cat - > "$config"
     ${pkgs.lib.getExe pkgs.fourmolu} --config "$config" "''${args[@]}"
   else
     exec ${pkgs.lib.getExe pkgs.fourmolu} --config "$baseConfig" "''${args[@]}"
