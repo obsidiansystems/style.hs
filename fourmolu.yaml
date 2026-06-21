@@ -15,7 +15,7 @@ single-deriving-parens: always
 sort-constraints: false
 sort-derived-classes: true
 sort-deriving-clauses: true
-trailing-section-operators: false
+trailing-section-operators: true
 unicode: never
 respectful: true
 
