@@ -14,7 +14,8 @@
     in {
       packages = eachSystem (system:
         let pkgs = system-pkgs system;
-        in {
+        in rec {
+          default = fourmolu;
           fourmolu = import ./fourmolu.nix { inherit inputs system pkgs; };
         }
       );
