@@ -66,7 +66,7 @@ git submodule update --remote style.hs
 ### Use `fourmolu.yaml` as an executable
 
 [`fourmolu.yaml`](./fourmolu.yaml) is both the config *and* a runnable
-[Nix shebang](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-shell#shebang)
+[Nix shebang](https://nix.dev/manual/nix/stable/command-ref/new-cli/nix.html?highlight=shebang#shebang-interpreter)
 script. Copy it into a project and run it directly to format files using itself as
 the config:
 
