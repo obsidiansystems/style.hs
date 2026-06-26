@@ -4,7 +4,7 @@
 
 one shared `fourmolu.yaml` · `nix run` anywhere · consistent formatting across projects
 
-![Haskell](https://img.shields.io/badge/Haskell-5e5086?logo=haskell&logoColor=white) [![Built with Nix](https://img.shields.io/static/v1?logo=nixos&logoColor=white&label=&message=Built%20with%20Nix&color=41439a)](https://nixos.org) [![Obsidian](https://img.shields.io/badge/Obsidian-Systems-white)](https://obsidian.systems)
+![Haskell](https://img.shields.io/badge/Haskell-5e5086?logo=haskell&logoColor=white) [![Built with Nix](https://img.shields.io/static/v1?logo=nixos&logoColor=white&label=&message=Built%20with%20Nix&color=41439a)](https://nixos.org) [![Obsidian](https://img.shields.io/badge/Obsidian-Systems-white)](https://obsidian.systems) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](./LICENSE)
 
 ```console
 $ nix run github:obsidiansystems/style.hs -- --mode inplace src/   # format your Haskell, Obsidian-style
@@ -126,3 +126,9 @@ it, we'd love to hear from you.
 - Website — <https://obsidian.systems>
 - Blog — <https://blog.obsidian.systems>
 - GitHub — <https://github.com/obsidiansystems>
+
+## License
+
+style.hs is released under the [BSD-3-Clause License](./LICENSE), © 2026 Obsidian Systems
+LLC. fourmolu and the other tools it wraps are distributed under their own upstream
+licenses.
