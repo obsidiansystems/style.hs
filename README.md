@@ -1,11 +1,28 @@
 # style.hs
 
-Obsidian Systems' shared Haskell code style, packaged as a [Nix](https://nixos.org/)
-flake that wraps [`fourmolu`](https://github.com/fourmolu/fourmolu) with a common
-[`fourmolu.yaml`](./fourmolu.yaml).
+### Obsidian-style Haskell
 
-Point any of our Haskell projects at this flake and they all format the same way,
-without each repo having to vendor and maintain its own copy of the config.
+one shared `fourmolu.yaml` · `nix run` anywhere · consistent formatting across projects
+
+![Haskell](https://img.shields.io/badge/Haskell-5e5086?logo=haskell&logoColor=white) [![Built with Nix](https://img.shields.io/static/v1?logo=nixos&logoColor=white&label=&message=Built%20with%20Nix&color=41439a)](https://nixos.org) [![Obsidian](https://img.shields.io/badge/Obsidian-Systems-white)](https://obsidian.systems)
+
+```console
+$ nix run github:obsidiansystems/style.hs -- --mode inplace src/   # format your Haskell, Obsidian-style
+$ nix run github:obsidiansystems/style.hs -- --mode check   src/   # or just check it, e.g. in CI
+```
+
+A [Nix](https://nixos.org/) flake that wraps [`fourmolu`](https://github.com/fourmolu/fourmolu)
+with a common [`fourmolu.yaml`](./fourmolu.yaml). Point any of your Haskell projects at
+this flake and they all format the same way, without each repo having to vendor and
+maintain its own copy of the config. The config implements our [Haskell Style
+Guide](./STYLE.md).
+
+## Why style.hs?
+
+- **One config, every repo.** Reference the flake and your projects format identically.
+- **Drop in however you like.** Run it directly with `nix run`, add it to a dev shell so
+  plain `fourmolu` just works, vendor it as a git submodule, or run the config file
+  itself as an executable.
 
 ## Usage
 
@@ -88,9 +105,24 @@ The wrapper resolves which config to use as follows:
 
 ## What's in the repo
 
-| File | Purpose |
-| --- | --- |
-| [`fourmolu.yaml`](./fourmolu.yaml) | The shared style config; also a runnable Nix shebang script. |
-| [`fourmolu.nix`](./fourmolu.nix) | Builds the `fourmolu` wrapper that bundles the config and handles `--config`. |
-| [`flake.nix`](./flake.nix) | Exposes the `fourmolu` (and `default`) package for every supported system. |
-| [`inputs.nix`](./inputs.nix) | `flake-compat` shim so non-flake Nix can consume the inputs. |
+| File                               | Purpose                                                                                        |
+| ---                                | ---                                                                                            |
+| [`STYLE.md`](./STYLE.md)           | The Obsidian Haskell Style Guide: the reasoning behind the rules.                              |
+| [`fourmolu.yaml`](./fourmolu.yaml) | The shared style config: also a runnable Nix shebang script.                                                                |
+| [`fourmolu.nix`](./fourmolu.nix)   | Builds `fourmolu` wrapper that bundles the config and handles `--config`.                                                  |
+| [`flake.nix`](./flake.nix)         | Exposes the `fourmolu` (and `default`) package for every supported system.                     |
+| [`inputs.nix`](./inputs.nix)       | `flake-compat` shim so non-flake Nix can consume the inputs.                                   |
+
+## About Obsidian Systems
+
+style.hs is built and maintained by **[Obsidian Systems](https://obsidian.systems)**. We
+provide frontier engineering for high-assurance systems, and we're long-time stewards of
+open-source Nix, Haskell, and daml tooling, including [Obelisk](https://github.com/obsidiansystems/obelisk),
+[Reflex](https://reflex-frp.org/), [nix-daml-sdk](https://github.com/obsidiansystems/nix-daml-sdk), and [nix-thunk](https://github.com/obsidiansystems/nix-thunk).
+
+If you're building with Haskell or Nix and want a partner to help design, build, or ship
+it, we'd love to hear from you.
+
+- Website — <https://obsidian.systems>
+- Blog — <https://blog.obsidian.systems>
+- GitHub — <https://github.com/obsidiansystems>

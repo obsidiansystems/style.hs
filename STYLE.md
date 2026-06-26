@@ -35,38 +35,55 @@ easier to read than one that's perfect in some places but overall inconsistent.
 [`style.hs`](./README.md) automates almost everything in this section.
 
 - **Two-space indentation.** Never tabs.
-- **Fixed indentation over alignment.** Indent a consistent step rather than lining up
-  with something on the line above.
-- **Leading commas, aligned braces.** When a list, record, or tuple spans multiple
-  lines, the opening brace, every comma, and the closing brace all sit in the same
-  column, one element per line. It looks unusual at first, but adding or removing an
-  element becomes a genuine one-line diff.
-- **Leading arrows.** When a type signature breaks across lines, the `::` and each `->`
-  lead their line. When a `forall` breaks across lines, treat the `.` the way you'd
-  treat a `->`.
-- **`where` on its own line,** indented two spaces, with its body starting on the next
-  line and indented two further.
-- **A `do` block's first statement** goes on the line *after* `do`, not beside it.
-- **`forall a.`** has a space after the dot, none before, when it's all on one line.
-- **Operator sections hug their parenthesis:** `(+ 1)`, `(1 +)`. No space between the
-  paren and the operator; keep the space to the argument. (Elsewhere, operators get
-  whitespace on both sides.)
-- **One blank line, never two.** Doubled blank lines tend to mean different things to
-  different people, which is to say they mean nothing. If you want to mark off a large
-  section, a comment header carries more information than extra whitespace.
-- **Unix line endings,** and every file ends with exactly one newline with no trailing
-  blank lines.
-- A space before `where` in a module's export list, and no newline before the `=` in a
-  definition.
+- **Fixed indentation over alignment.** Indent a consistent step rather than
+  lining up with something on the line above.
+- **Leading commas.** When a list, record, or tuple spans multiple lines, every
+  element after the first begins with a comma.
+- **Aligned braces.** When a list, record, or tuple spans multiple lines, the
+  opening brace, every comma, and the closing brace sit in the same column, one
+  element per line. It may look unusual at first, but adding or removing an
+  element becomes a one-line diff.
+- **Leading arrows.** When a type signature breaks across lines, the `::` and
+  each `->` lead their line.
+- **A broken `forall` aligns its dot like an arrow.** When a `forall` breaks
+  across lines, treat the `.` the way you'd treat a `->`.
+- **`forall a.` spacing on one line:** a space after the dot, none before.
+- **`where` on its own line,** indented two spaces, with its body starting on
+  the next line and indented two further.
+- **A `do` block's first statement** goes on the line *after* `do`, not beside
+  it.
+- **Operators are surrounded by whitespace.** A binary operator gets a space on
+  each side: `x + y`, `f <$> x`.
+- **Operator sections hug their parenthesis.** `(+ 1)`, `(1 +)` — no space
+  between the paren and the operator, but keep the space to the argument.
+- **A comma is followed by whitespace** — a space, or a line break. `(a, b)`,
+  never `(a,b)`.
+- **A comma carries whitespace before it only as a leading comma,** i.e. when
+  it's the first non-whitespace character on its line. Otherwise it hugs the
+  token before it: `(a, b)`, never `(a , b)`.
+- **Single-constraint contexts are never parenthesized.** `Show a => a -> a`,
+  not `(Show a) => a -> a`.
+- **No stray spaces.** Don't leave extra whitespace between tokens beyond what
+  these rules call for.
+- **One blank line, never two.** Doubled blank lines tend to mean different
+  things to different people, which is to say they mean nothing. If you want to
+  mark off a large section, a comment header carries more information than
+  extra whitespace.
+- **Unix line endings.** Never carriage returns.
+- **Every file ends with a single newline.**
+- **No trailing blank lines** at the end of a file.
+- **A space before `where`** in a module's export list.
+- **No newline before the `=`** in a definition.
 
 A few habits in the same spirit that the formatter won't do for you:
 
-- `$` instead of wrapping the tail end of a line in parentheses, and prefer `$`
-  to `.` when either would read the same.
-- Add parentheses around uncommon operators whose precedence isn't obvious: clarity is
-  worth a few characters. Don't parenthesize plain function application, though.
-- Append with `<>`, not `++`. They behave identically on lists, but `<>` leaves the door
-  open to changing your string or sequence type later without a rewrite.
+- **Prefer `$` to trailing parentheses** rather than wrapping the tail end of a line.
+- **Prefer `$` to `.`** when either would read the same.
+- **Parenthesize uncommon operators** whose precedence isn't obvious: clarity is worth a
+  few characters.
+- **Don't parenthesize plain function application.**
+- **Append with `<>`, not `++`.** They behave identically on lists, but `<>` leaves the
+  door open to changing your string or sequence type later without a rewrite.
 
 ## Imports
 
