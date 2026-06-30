@@ -92,13 +92,28 @@ we always bring them in `qualified` — or with a small, explicit import list:
 
 | Module                           | Imported as                                   |
 | ---                              | ---                                           |
-| `Data.ByteString`                | `qualified ... as BS`                         |
-| `Data.ByteString.Lazy`           | `qualified ... as LBS`                        |
-| `Data.Text`                      | `qualified ... as T`, plus `Data.Text (Text)` |
-| `Data.Map` / `Data.Map.Monoidal` | `qualified ... as Map`, plus the type         |
-| `Data.Set`                       | `qualified ... as Set`, plus `Data.Set (Set)` |
+| `Data.ByteString`                | `qualified as BS`                             |
+| `Data.ByteString.Lazy`           | `qualified as LBS`                            |
+| `Data.Text`                      | `qualified as T`, plus `Data.Text (Text)`     |
+| `Data.Map` / `Data.Map.Monoidal` | `qualified as Map`, plus the type             |
+| `Data.Set`                       | `qualified as Set`, plus `Data.Set (Set)`     |
 
 The aim is that an unqualified name is always one you can find a home for at a glance.
+
+**Put `qualified` after the module name, not before.** Post-qualified imports line the
+module names up in the same column whether or not they're qualified, which keeps the import
+block easy to scan and to sort. (This needs the `ImportQualifiedPost` extension, on by
+default since GHC 9.6.)
+
+```haskell
+-- Worse: qualified sits before the name, so module names don't line up
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as BS
+
+-- Better: the module name comes first in every import
+import Data.ByteString (ByteString)
+import Data.ByteString qualified as BS
+```
 
 ## Safety: avoid partial functions
 
