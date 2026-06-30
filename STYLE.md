@@ -163,12 +163,60 @@ Consistent names are names you can *guess*. Three conventions carry most of the
 weight:
 
 - The field of a `newtype MyNewtype`, if it's named, is `unMyNewtype`.
-- Fields of a record `MyRecord` are named `_myRecord_fieldName` or
-  `myRecord_fieldName`.
+- Record fields are named plainly, with no record-name prefix. Just write
+  `fieldName`. See *Record fields* below for the why, and for the older
+  prefixed convention you'll still meet in existing code.
 - Constructors of a sum type `MySumType` are named `MySumType_ConstructorName`.
 
 Avoid primed names (`foo'`). A prime is easy to misread and easy to shadow by
 accident. A real name almost always says more.
+
+## Record fields
+
+A record field in Haskell is, by default, a top-level selector function. Two
+consequences shaped our old convention: distinct records couldn't share a field
+name, and a selector on a sum type is *partial*, exactly the quiet failure the
+safety rules above warn against. The workaround was to prefix every field with
+its record, e.g. `_myRecord_fieldName`.
+
+We no longer need the prefix. A few extensions (all in the default set below),
+together with [`generic-lens`](https://hackage.haskell.org/package/generic-lens),
+let fields be named plainly:
+
+- `DuplicateRecordFields` lets distinct records share a field name.
+- `NoFieldSelectors` keeps fields from leaking into the module namespace as
+  (partial) top-level functions.
+- `OverloadedRecordDot` gives `record.fieldName` access.
+- `OverloadedRecordUpdate` gives `record { fieldName = ... }` updates that
+  resolve by type.
+
+```haskell
+data Record1 = Record1
+  { fieldName1 :: Int
+  , fieldName2 :: String
+  }
+
+-- A different record may reuse the same field names.
+data Record2 = Record2
+  { fieldName1 :: Bool
+  , fieldName2 :: Char
+  }
+
+-- Given a :: Record1 and b :: Record2:
+c = a.fieldName1 -- OverloadedRecordDot
+c' = a ^. #fieldName1 -- generic-lens optic
+d = b { fieldName1 = not b.fieldName1 } -- OverloadedRecordUpdate
+d' = b & #fieldName1 %~ not -- generic-lens optic
+```
+
+The bare name is also what makes generic-lens's `#fieldName` optics work (with
+`OverloadedLabels`). The prefixed form doesn't: `#_myRecord_fieldName` isn't a
+usable label.
+
+Plenty of existing modules still use the `_myRecord_fieldName` (or
+`myRecord_fieldName`) prefix. Match the surrounding convention when you edit
+them, since consistency outranks this preference, and use bare names in new
+code.
 
 ## Prefer `case` to multiple clauses
 
@@ -224,7 +272,11 @@ per-module `LANGUAGE` boilerplate:
 `DeriveFoldable`, `DeriveFunctor`, `DeriveGeneric`, `DeriveTraversable`,
 `GeneralizedNewtypeDeriving`, `MultiParamTypeClasses`, `RankNTypes`,
 `StandaloneDeriving`, `TypeFamilies`, `TypeApplications`,
-`AllowAmbiguousTypes`, `OverloadedStrings`, `EmptyDataDeriving`.
+`AllowAmbiguousTypes`, `OverloadedStrings`, `EmptyDataDeriving`,
+`DuplicateRecordFields`, `NoFieldSelectors`, `OverloadedRecordDot`,
+`OverloadedRecordUpdate`.
 
-One caveat: `RankNTypes` can interfere with GHC's ability to spot redundant or
-simplifiable typeclass contexts.
+Two caveats. `RankNTypes` can interfere with GHC's ability to spot redundant or
+simplifiable typeclass contexts. And `OverloadedRecordUpdate` is still
+experimental and pulls in `RebindableSyntax`, so if it causes trouble it's the
+first one to drop.
