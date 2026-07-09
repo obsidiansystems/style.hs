@@ -178,9 +178,15 @@ Consistent names are names you can *guess*. Three conventions carry most of the
 weight:
 
 - The field of a `newtype MyNewtype`, if it's named, is `unMyNewtype`.
-- Fields of a record `MyRecord` are named `_myRecord_fieldName` or
-  `myRecord_fieldName`.
+- Fields of a record `MyRecord` are named `myRecord_fieldName`.
 - Constructors of a sum type `MySumType` are named `MySumType_ConstructorName`.
+
+When you want lenses for a record, prefer
+[`generic-lens`](https://hackage.haskell.org/package/generic-lens) rather than
+Template Haskell's `makeLenses`. It builds lenses from the `Generic` instance
+you're already deriving (see above): `record ^. #myRecord_fieldName`. There's
+no generated code, no Template Haskell, and no need for the
+underscore-prefixed field names that `makeLenses` expects.
 
 Avoid primed names (`foo'`). A prime is easy to misread and easy to shadow by
 accident. A real name almost always says more.
