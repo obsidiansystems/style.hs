@@ -26,8 +26,67 @@
 # The list is the standard one STYLE.md points at. Functions that are only
 # partial on infinite lists are deliberately absent, as are the near-unavoidable
 # ones (div, mod, quot, succ, toEnum) that hlint's `partial-strict` group bans.
+#
+# The names are qualified, which matters. hlint matches an unqualified name
+# against every module it could have come from, so a bare `head` also bans
+# `NonEmpty.head` — which is total, and is precisely what you are supposed to
+# reach for once you have a NonEmpty. The same goes for `last`, `tail`, `init`,
+# `maximum` and `minimum`. Qualifying each entry bans the partial version and
+# leaves the NonEmpty (and Foldable1) counterparts alone.
+#
+# The cost of qualifying is that every partial source has to be spelled out, so
+# Text and ByteString appear here too: their `head`/`last`/`tail`/`init` are
+# just as partial as the list ones. `!!` and `fromJust` stay unqualified
+# because they are partial wherever they come from, NonEmpty included.
 - functions:
-  - name: [head, last, tail, init, "!!", fromJust, foldr1, foldl1, maximum, minimum, maximumBy, minimumBy, Data.List.NonEmpty.fromList]
+  - name:
+      - Prelude.head
+      - Prelude.last
+      - Prelude.tail
+      - Prelude.init
+      - Data.List.head
+      - Data.List.last
+      - Data.List.tail
+      - Data.List.init
+      - Prelude.foldr1
+      - Prelude.foldl1
+      - Prelude.maximum
+      - Prelude.minimum
+      - Data.List.foldr1
+      - Data.List.foldl1
+      - Data.List.maximum
+      - Data.List.minimum
+      - Data.List.maximumBy
+      - Data.List.minimumBy
+      - Data.Foldable.foldr1
+      - Data.Foldable.foldl1
+      - Data.Foldable.maximum
+      - Data.Foldable.minimum
+      - Data.Foldable.maximumBy
+      - Data.Foldable.minimumBy
+      - Data.Text.head
+      - Data.Text.last
+      - Data.Text.tail
+      - Data.Text.init
+      - Data.Text.Lazy.head
+      - Data.Text.Lazy.last
+      - Data.Text.Lazy.tail
+      - Data.Text.Lazy.init
+      - Data.ByteString.head
+      - Data.ByteString.last
+      - Data.ByteString.tail
+      - Data.ByteString.init
+      - Data.ByteString.Char8.head
+      - Data.ByteString.Char8.last
+      - Data.ByteString.Char8.tail
+      - Data.ByteString.Char8.init
+      - Data.ByteString.Lazy.head
+      - Data.ByteString.Lazy.last
+      - Data.ByteString.Lazy.tail
+      - Data.ByteString.Lazy.init
+      - "!!"
+      - fromJust
+      - Data.List.NonEmpty.fromList
     within: []
     message: 'STYLE.md: partial function. It fails far from the mistake that caused it, with a message that tells you nothing.'
   - name: undefined
@@ -98,6 +157,12 @@
 
 # `concat [a, b]` -> `a ++ b`, which contradicts the `<>` rule above.
 - ignore: {name: Use ++}
+
+# `when (not p)` -> `unless p`. Both spellings are fine, so this is left to the
+# author: a `when (not p)` sitting next to a `when q` reads as one parallel
+# pair, where swapping in `unless` makes the reader match up two different
+# words and a dropped negation to see that the guards are related.
+- ignore: {name: Use unless}
 
 # Left on deliberately, so nobody "fixes" them later:
 #
