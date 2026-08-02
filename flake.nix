@@ -18,6 +18,7 @@
           default = fourmolu;
           fourmolu = import ./fourmolu.nix { inherit inputs system pkgs; };
           stylish-haskell = import ./stylish-haskell.nix { inherit inputs system pkgs; };
+          hlint = import ./hlint.nix { inherit inputs system pkgs; };
         }
       );
     };
