@@ -1,8 +1,8 @@
 # Obsidian Systems Haskell Style Guide
 
 This is how we write Haskell at Obsidian Systems, and, more usefully, *why*. It's
-the thinking behind [`style.hs`](./README.md). The fourmolu config in this
-repo handles the mechanical formatting for you, so most of this guide is about
+the thinking behind [`style.hs`](./README.md). The formatter configs in this
+repo handle the mechanical formatting for you, so most of this guide is about
 the judgment calls a tool can't make for you and the reasoning behind our
 config decisions.
 
