@@ -2,7 +2,7 @@
 
 ### Obsidian-style Haskell
 
-shared formatter configs · `nix run` anywhere · consistent formatting across projects
+shared formatter and linter configs · `nix run` anywhere · consistent Haskell across projects
 
 ![Haskell](https://img.shields.io/badge/Haskell-5e5086?logo=haskell&logoColor=white) [![Built with Nix](https://img.shields.io/static/v1?logo=nixos&logoColor=white&label=&message=Built%20with%20Nix&color=41439a)](https://nixos.org) [![Obsidian](https://img.shields.io/badge/Obsidian-Systems-white)](https://obsidian.systems) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](./LICENSE)
 
@@ -11,15 +11,22 @@ $ nix run github:obsidiansystems/style.hs -- --mode inplace src/   # format your
 $ nix run github:obsidiansystems/style.hs -- --mode check   src/   # or just check it, e.g. in CI
 
 $ nix run github:obsidiansystems/style.hs#stylish-haskell -- -i -r src/   # the low-diff alternative
+$ nix run github:obsidiansystems/style.hs#hlint -- src/                   # and lint it, Obsidian-style
 ```
 
-A [Nix](https://nixos.org/) flake that wraps two formatters,
-[`fourmolu`](https://github.com/fourmolu/fourmolu) and
-[`stylish-haskell`](https://github.com/haskell/stylish-haskell), with common configs:
-[`fourmolu.yaml`](./fourmolu.yaml) and [`stylish-haskell.yaml`](./stylish-haskell.yaml).
-Point any of your Haskell projects at this flake and they all format the same way,
-without each repo having to vendor and maintain its own copy of the config. Both configs
-implement our [Haskell Style Guide](./STYLE.md).
+A [Nix](https://nixos.org/) flake that wraps three tools, two formatters and a linter:
+[`fourmolu`](https://github.com/fourmolu/fourmolu),
+[`stylish-haskell`](https://github.com/haskell/stylish-haskell) and
+[`hlint`](https://github.com/ndmitchell/hlint), with common configs:
+[`fourmolu.yaml`](./fourmolu.yaml), [`stylish-haskell.yaml`](./stylish-haskell.yaml) and
+[`hlint.yaml`](./hlint.yaml). Point any of your Haskell projects at this flake and they
+all format and lint the same way, without each repo having to vendor and maintain its own
+copy of the config. All three configs implement our [Haskell Style Guide](./STYLE.md).
+
+The two formatters are alternatives: pick one per project. hlint is neither, and runs
+alongside whichever you pick. A formatter decides layout, hlint decides what you write, so
+hlint carries the half of the guide no formatter can check, above all
+"[avoid partial functions](./STYLE.md#safety-avoid-partial-functions)".
 
 ## Why style.hs?
 
@@ -75,6 +82,16 @@ nix run github:obsidiansystems/style.hs#stylish-haskell -- -i -r src/
 git diff --exit-code
 ```
 
+hlint lives at the `#hlint` attribute, and takes its own flags:
+
+```sh
+nix run github:obsidiansystems/style.hs#hlint -- src/
+```
+
+It exits non-zero the moment it finds anything, so it needs no separate check mode for
+CI. `--refactor` applies the fixes in place instead of printing them, and
+`--no-exit-code` reports without failing the build.
+
 ### Add it to a project
 
 Reference the flake as an input and use the `fourmolu` package as your formatter,
@@ -97,12 +114,13 @@ for example in a dev shell:
 
 Inside that shell, plain `fourmolu` already uses the Obsidian Systems style, with
 no `--config` needed. Swap in `style.packages.${system}.stylish-haskell` to get a
-`stylish-haskell` that behaves the same way.
+`stylish-haskell` that behaves the same way, and add `style.packages.${system}.hlint`
+alongside either for a matching `hlint`.
 
 ### Vendor it as a git submodule
 
 Add this repo as a submodule and symlink your project's config to the vendored one.
-Both formatters discover their config from the project root automatically, so editors,
+All three tools discover their config from the project root automatically, so editors,
 formatters, and CI all pick up the style with no flags:
 
 ```sh
@@ -110,11 +128,13 @@ git submodule add https://github.com/obsidiansystems/style.hs style.hs
 
 ln -s style.hs/fourmolu.yaml fourmolu.yaml                    # fourmolu
 ln -s style.hs/stylish-haskell.yaml .stylish-haskell.yaml     # stylish-haskell
+ln -s style.hs/hlint.yaml .hlint.yaml                         # hlint
 ```
 
-Note the leading dot on the stylish-haskell symlink: it searches for
-`.stylish-haskell.yaml` in the current directory and its ancestors, then
-`$XDG_CONFIG_HOME/stylish-haskell/config.yaml`, then `$HOME/.stylish-haskell.yaml`.
+Note the leading dots. stylish-haskell searches for `.stylish-haskell.yaml` in the current
+directory and its ancestors, then `$XDG_CONFIG_HOME/stylish-haskell/config.yaml`, then
+`$HOME/.stylish-haskell.yaml`. hlint searches for `.hlint.yaml` in the current directory
+and its ancestors, then in your home directory.
 
 Pull in later changes to the shared style by updating the submodule:
 
@@ -124,22 +144,23 @@ git submodule update --remote style.hs
 
 ### Use the config file as an executable
 
-[`fourmolu.yaml`](./fourmolu.yaml) and [`stylish-haskell.yaml`](./stylish-haskell.yaml)
-are each both the config *and* a runnable
+[`fourmolu.yaml`](./fourmolu.yaml), [`stylish-haskell.yaml`](./stylish-haskell.yaml) and
+[`hlint.yaml`](./hlint.yaml) are each both the config *and* a runnable
 [Nix shebang](https://nix.dev/manual/nix/stable/command-ref/new-cli/nix.html?highlight=shebang#shebang-interpreter)
-script. Copy one into a project and run it directly to format files using itself as
+script. Copy one into a project and run it directly to process files using itself as
 the config:
 
 ```sh
 ./fourmolu.yaml --mode inplace src/
 ./stylish-haskell.yaml -i -r src/
+./hlint.yaml src/
 ```
 
 This needs `nix` on `PATH` with flakes enabled.
 
 ## Choosing a config
 
-Each wrapper resolves which config to use as follows:
+Each formatter wrapper resolves which config to use as follows:
 
 - **No config flag**: the bundled `fourmolu.yaml` / `stylish-haskell.yaml` (the default).
 - **`--config <path>`** / **`--config=<path>`**: your own config file. Repeated config
@@ -148,6 +169,19 @@ Each wrapper resolves which config to use as follows:
 
 The stylish-haskell wrapper additionally accepts that tool's short form, `-c <path>` or
 `-c<path>`, including at the end of a bundled cluster such as `-ic <path>`.
+
+hlint spells the flag `--hint <path>`, `--hint=<path>`, `-h <path>` or `-h<path>`, and
+its configs *layer* rather than replace. hlint always loads its own built-in hints first,
+then the bundled `hlint.yaml`, then anything you pass, with later files winning. So
+`--hint mine.yaml` adds to the Obsidian rules instead of discarding them, and
+`- ignore: {name: ...}` is how you switch one of them off. `--hint -` reads the config
+from stdin, which plain hlint does not accept.
+
+Two consequences are worth knowing. Passing any `--hint` stops hlint hunting for a
+project's own `.hlint.yaml`, so pass yours explicitly if you have one. And since the
+wrapper injects the bundled config itself, `./hlint.yaml` run as an executable would
+otherwise load it twice and report every custom rule twice over; the wrapper notices a
+byte-identical copy and skips its own.
 
 ## What stylish-haskell covers
 
@@ -190,7 +224,7 @@ And these are out of reach. Use fourmolu, or your own discipline, for them:
   and has no notion of which modules are local to your package. The config therefore
   leaves your blank-line groups alone and only sorts within them.
 
-## Where the two tools differ
+## Where the two formatters differ
 
 On imports the two agree exactly: sorting, deduplication, post-qualification and list
 layout all produce byte-identical output. The same holds for any declaration or export
@@ -216,6 +250,38 @@ isn't enabled, leaving code that needs the extension to parse. fourmolu only rew
 when the extension is already in scope. The extension is on by default from GHC 9.6; on
 anything older, put it in your cabal file's `default-extensions`.
 
+## What hlint enforces
+
+Whichever formatter you pick covers STYLE.md's layout rules. These are the rules hlint
+adds on top, all of which a formatter is blind to:
+
+| Rule | How |
+| --- | --- |
+| [Avoid partial functions](./STYLE.md#safety-avoid-partial-functions): `head`, `last`, `tail`, `init`, `(!!)`, `fromJust`, `foldr1`, `foldl1`, `maximum`, `minimum`, `NonEmpty.fromList` | `functions` restriction |
+| `Data.Map.!` is partial, and so is `read` | `functions` restriction |
+| `decodeUtf8` is partial: use `decodeUtf8With lenientDecode` | `functions` restriction |
+| Don't use `undefined` | `functions` restriction |
+| No `RecordWildCards`, `NamedFieldPuns` or `DeriveAnyClass` | `extensions` restriction |
+| Post-qualified imports, `import Data.Text qualified as T` | `modules`, `qualifiedStyle: post` |
+| The import alias table: `T`, `Map`, `Set`, `BS`, `LBS` | `modules`, `as:` |
+| Append with `<>`, not `++` | a custom `warn` rule |
+| Prefer `\case` to multiple clauses | hlint's built-in `Use lambda-case` |
+
+The config spells the partial-function list out rather than enabling hlint's built-in
+`partial` group. A `functions` restriction matches an identifier wherever it appears, so
+it catches `map head` and `(!! 3)` as well as `head xs`; the group's rewrite rules only
+fire on applied uses, and let a bare `map head` through.
+
+It also silences the built-in hints that contradict the guide. `Use camelCase` fires on
+every `myRecord_fieldName` and `MySumType_Ctor`, which is precisely the naming STYLE.md
+mandates, and hints like `Use head` (`x !! 0` → `head x`) or `Use ++`
+(`concat [a, b]` → `a ++ b`) would push you toward something the config just banned.
+
+Out of reach, and left to GHC or to you: `-Wall` cleanliness, a type signature on every
+top-level definition, `-Wmissing-methods`, deriving everything GHC will give you, the
+`unMyNewtype` / `myRecord_field` / `MySumType_Ctor` naming beyond the camelCase
+exemption, and avoiding primed names.
+
 ## What's in the repo
 
 | File                                             | Purpose                                                                     |
@@ -225,7 +291,9 @@ anything older, put it in your cabal file's `default-extensions`.
 | [`fourmolu.nix`](./fourmolu.nix)                 | Builds the `fourmolu` wrapper that bundles the config and handles `--config`. |
 | [`stylish-haskell.yaml`](./stylish-haskell.yaml) | The same style for stylish-haskell: also a runnable Nix shebang script.     |
 | [`stylish-haskell.nix`](./stylish-haskell.nix)   | Builds the `stylish-haskell` wrapper, likewise.                             |
-| [`flake.nix`](./flake.nix)                       | Exposes the `fourmolu` (and `default`) and `stylish-haskell` packages for every supported system. |
+| [`hlint.yaml`](./hlint.yaml)                     | The same style for hlint: also a runnable Nix shebang script.               |
+| [`hlint.nix`](./hlint.nix)                       | Builds the `hlint` wrapper, likewise.                                       |
+| [`flake.nix`](./flake.nix)                       | Exposes the `fourmolu` (and `default`), `stylish-haskell` and `hlint` packages for every supported system. |
 | [`inputs.nix`](./inputs.nix)                     | `flake-compat` shim so non-flake Nix can consume the inputs.                |
 
 ## About Obsidian Systems
