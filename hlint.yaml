@@ -183,29 +183,101 @@
 # - `Use lambda-case` stays on. It matches STYLE.md's "Prefer `case` to multiple
 #   clauses", whose preferred form is `\case`.
 
-# STYLE.md, "Extensions we'd turn on by default". Obsidian projects enable
-# these in the cabal file, and hlint does not read cabal files, so without this
-# it can misparse code that relies on them. ImportQualifiedPost is added for
-# the import rule above.
+# Extensions Obsidian projects turn on in the cabal file. hlint does not read
+# cabal files, so without this it misparses anything that relies on them: a
+# module with no per-module LANGUAGE pragmas is exactly the case the shared
+# cabal preamble is meant to produce, and hlint would choke on the first
+# quasiquote or multiline string.
+#
+# This mirrors the preamble's `default-extensions`, which is a superset of
+# STYLE.md's "Extensions we'd turn on by default". That is deliberate: the list
+# is here only to make hlint parse what GHC already accepts, not to endorse
+# every entry. ImportQualifiedPost is required by the import rule above, and
+# the No* entries match the extensions the `extensions` restriction bans.
 - arguments:
-  - -XScopedTypeVariables
-  - -XFlexibleContexts
-  - -XFlexibleInstances
-  - -XFunctionalDependencies
-  - -XGADTs
-  - -XLambdaCase
+  - -XAllowAmbiguousTypes
+  - -XApplicativeDo
+  - -XArrows
+  - -XBangPatterns
+  - -XBinaryLiterals
+  - -XBlockArguments
+  - -XConstrainedClassMethods
+  - -XConstraintKinds
+  - -XDataKinds
+  - -XDefaultSignatures
   - -XDeriveDataTypeable
   - -XDeriveFoldable
   - -XDeriveFunctor
   - -XDeriveGeneric
+  - -XDeriveLift
   - -XDeriveTraversable
-  - -XGeneralizedNewtypeDeriving
-  - -XMultiParamTypeClasses
-  - -XRankNTypes
-  - -XStandaloneDeriving
-  - -XTypeFamilies
-  - -XTypeApplications
-  - -XAllowAmbiguousTypes
-  - -XOverloadedStrings
+  - -XDerivingStrategies
+  - -XDerivingVia
+  - -XDisambiguateRecordFields
+  - -XDoAndIfThenElse
+  - -XDuplicateRecordFields
+  - -XEmptyCase
+  - -XEmptyDataDecls
   - -XEmptyDataDeriving
+  - -XExistentialQuantification
+  - -XExplicitForAll
+  - -XExplicitNamespaces
+  - -XExtendedDefaultRules
+  - -XFlexibleContexts
+  - -XFlexibleInstances
+  - -XFunctionalDependencies
+  - -XGADTs
+  - -XGeneralizedNewtypeDeriving
+  - -XHexFloatLiterals
   - -XImportQualifiedPost
+  - -XImpredicativeTypes
+  - -XInstanceSigs
+  - -XKindSignatures
+  - -XLambdaCase
+  - -XLexicalNegation
+  - -XLiberalTypeSynonyms
+  - -XMonadComprehensions
+  - -XMultilineStrings
+  - -XMultiParamTypeClasses
+  - -XMultiWayIf
+  - -XNamedDefaults
+  - -XNegativeLiterals
+  - -XNoDeriveAnyClass
+  - -XNoNamedFieldPuns
+  - -XNoRecordWildCards
+  - -XNumericUnderscores
+  - -XOrPatterns
+  - -XOverloadedLabels
+  - -XOverloadedLists
+  - -XOverloadedRecordDot
+  - -XOverloadedStrings
+  - -XPackageImports
+  - -XParallelListComp
+  - -XPartialTypeSignatures
+  - -XPatternGuards
+  - -XPatternSynonyms
+  - -XPolyKinds
+  - -XPostfixOperators
+  - -XQualifiedDo
+  - -XQuantifiedConstraints
+  - -XQuasiQuotes
+  - -XRankNTypes
+  - -XRecursiveDo
+  - -XRequiredTypeArguments
+  - -XRoleAnnotations
+  - -XScopedTypeVariables
+  - -XStandaloneDeriving
+  - -XStandaloneKindSignatures
+  - -XTemplateHaskell
+  - -XTemplateHaskellQuotes
+  - -XTransformListComp
+  - -XTupleSections
+  - -XTypeApplications
+  - -XTypeData
+  - -XTypeFamilies
+  - -XTypeFamilyDependencies
+  - -XTypeOperators
+  - -XTypeSynonymInstances
+  - -XUndecidableInstances
+  - -XUnicodeSyntax
+  - -XViewPatterns
