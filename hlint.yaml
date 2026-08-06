@@ -164,6 +164,16 @@
 # words and a dropped negation to see that the guards are related.
 - ignore: {name: Use unless}
 
+# `\s -> "pre" <> s` -> `("pre" <>)`. Naming the argument is often the clearer
+# of the two, and which one wins is a judgement call the linter is not well
+# placed to make, so leave it to the author.
+#
+# Note this gives up the other half of the hint, `\x -> f x` -> `f`, which is a
+# plain eta-reduction and is usually an improvement. `Eta reduce` still covers
+# that shape at the top level of a definition; only lambdas nested inside an
+# expression go unremarked.
+- ignore: {name: Avoid lambda}
+
 # Left on deliberately, so nobody "fixes" them later:
 #
 # - The `dollar` group stays off. It rewrites `a $ b $ c` to `a . b $ c`, but
