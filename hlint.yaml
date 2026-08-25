@@ -128,13 +128,17 @@
   - {name: Data.ByteString, as: BS}
   - {name: Data.ByteString.Lazy, as: LBS}
 
+# The rules we want out of the built-in `generalise` group, taken on their own
+# rather than by enabling the group, which would also rewrite `map` to `fmap`
+# and `sequence [a]` to `pure <$> a`.
+#
 # STYLE.md, "Formatting": append with `<>`, not `++`. They behave identically
 # on lists, but `<>` leaves the door open to changing your sequence type later.
-#
-# This is the one rule we want out of the built-in `generalise` group, so we
-# take it on its own rather than enabling the group, which would also rewrite
-# `map` to `fmap` and `sequence [a]` to `pure <$> a`.
 - warn: {lhs: a ++ b, rhs: a <> b, name: "Use <>"}
+
+# `pure` asks only for an Applicative, where `return` asks for a Monad and is
+# the older duplicate of it.
+- warn: {lhs: return, rhs: pure, name: "Use pure"}
 
 # Built-in hints that contradict STYLE.md.
 #
