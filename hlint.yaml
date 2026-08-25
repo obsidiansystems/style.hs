@@ -204,7 +204,6 @@
 - arguments:
   - -XAllowAmbiguousTypes
   - -XApplicativeDo
-  - -XArrows
   - -XBangPatterns
   - -XBinaryLiterals
   - -XBlockArguments
