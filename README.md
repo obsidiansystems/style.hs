@@ -90,7 +90,8 @@ nix run github:obsidiansystems/style.hs#hlint -- src/
 
 It exits non-zero the moment it finds anything, so it needs no separate check mode for
 CI. `--refactor` applies the fixes in place instead of printing them, and
-`--no-exit-code` reports without failing the build.
+`--no-exit-code` reports without failing the build. `--with-group=generalise` adds the
+optional rules of [The generalise group](#the-generalise-group).
 
 ### Add it to a project
 
@@ -281,6 +282,39 @@ Out of reach, and left to GHC or to you: `-Wall` cleanliness, a type signature o
 top-level definition, `-Wmissing-methods`, deriving everything GHC will give you, the
 `unMyNewtype` / `myRecord_field` / `MySumType_Ctor` naming beyond the camelCase
 exemption, and avoiding primed names.
+
+### The generalise group
+
+Everything above is on by default. One set is not: preferring the more general of two
+functions that already do the same thing, so loosening a type later costs no call site.
+Turn it on per run:
+
+```sh
+nix run github:obsidiansystems/style.hs#hlint -- --with-group=generalise src/
+```
+
+| Prefer | Over |
+| --- | --- |
+| `<>` | `mappend` |
+| `pure`, `liftA2`, `<*>` | `return`, `liftM2`, `ap` |
+| `asum`, `<\|>`, `empty` | `msum`, `mplus`, `mzero` |
+| `traverse`, `traverse_`, `for`, `for_` | `mapM`, `mapM_`, `forM`, `forM_` |
+| `fold`, `foldMap` | `mconcat`, `concat`, `concatMap` |
+| `fmap`, `toList` | `Data.Map.map`, `Data.Map.elems` |
+
+It is off by default because a codebase adopts this on its own schedule. Every rewrite
+preserves behaviour, but a large project turns up hundreds of call sites at once, and
+that is a diff you want to choose the timing of.
+
+`generalise` is hlint's own group name, so these rules join its built-in members rather
+than replace them. Enabling it therefore also brings `map` to `fmap` and `sequence [a]`
+to `pure <$> a`, which is the point: the whole idea sits behind one switch. Two
+consequences follow. `++` is checked by default *and* by the built-in group, so a `++`
+reports twice with the group on. And `liftM` is absent from the group, because hlint
+suggests `fmap` for it either way.
+
+The Map rules are qualified across `Data.Map`, `Data.Map.Strict` and
+`Data.Map.Monoidal`, since a bare `map` or `elems` would match far more than a Map.
 
 ## What's in the repo
 
