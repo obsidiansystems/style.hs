@@ -131,10 +131,61 @@
 # STYLE.md, "Formatting": append with `<>`, not `++`. They behave identically
 # on lists, but `<>` leaves the door open to changing your sequence type later.
 #
-# This is the one rule we want out of the built-in `generalise` group, so we
-# take it on its own rather than enabling the group, which would also rewrite
-# `map` to `fmap` and `sequence [a]` to `pure <$> a`.
+# Always on, so it holds without the group below. hlint's own generalise
+# carries this rule too, so enabling that group reports a `++` twice.
 - warn: {lhs: a ++ b, rhs: a <> b, name: "Use <>"}
+
+# Preferring the more general of two functions that already do the same thing,
+# so loosening a type later costs no call site. Off by default, because a
+# codebase adopts this on its own schedule:
+#
+#   hlint --with-group=generalise src/
+#
+# The name is hlint's own group, so these rules join its built-in members
+# rather than replace them.
+- group:
+    name: generalise
+    enabled: false
+    rules:
+      # `<>` is the Semigroup method, where `mappend` is the Monoid one that
+      # duplicates it.
+      - warn: {lhs: mappend, rhs: "(<>)", name: "Use <>"}
+
+      # `pure`, `liftA2` and `<*>` ask for an Applicative, where the Monad-only
+      # spellings beside them are the older duplicates. `liftM` is absent
+      # because hlint suggests `fmap` for it already, and a second rule would
+      # report it twice.
+      - warn: {lhs: return, rhs: pure, name: "Use pure"}
+      - warn: {lhs: liftM2, rhs: liftA2, name: "Use liftA2"}
+      - warn: {lhs: ap, rhs: "(<*>)", name: "Use <*>"}
+
+      # The Alternative spellings, which the MonadPlus ones duplicate.
+      - warn: {lhs: msum, rhs: asum, name: "Use asum"}
+      - warn: {lhs: mplus, rhs: "(<|>)", name: "Use <|>"}
+      - warn: {lhs: mzero, rhs: empty, name: "Use empty"}
+
+      # The Traversable spellings, which ask for an Applicative where the `M`
+      # spellings ask for a Monad.
+      - warn: {lhs: mapM, rhs: traverse, name: "Use traverse"}
+      - warn: {lhs: mapM_, rhs: traverse_, name: "Use traverse_"}
+      - warn: {lhs: forM, rhs: for, name: "Use for"}
+      - warn: {lhs: forM_, rhs: for_, name: "Use for_"}
+
+      # The Foldable spellings, which take any container where these take a
+      # list.
+      - warn: {lhs: mconcat, rhs: fold, name: "Use fold"}
+      - warn: {lhs: concat, rhs: fold, name: "Use fold"}
+      - warn: {lhs: concatMap, rhs: foldMap, name: "Use foldMap"}
+
+      # A Map is a Functor and a Foldable, so it needs no spellings of its own.
+      # Qualified, because a bare `map` or `elems` would match far more than a
+      # Map.
+      - warn: {lhs: Data.Map.map, rhs: fmap, name: "Use fmap"}
+      - warn: {lhs: Data.Map.Strict.map, rhs: fmap, name: "Use fmap"}
+      - warn: {lhs: Data.Map.Monoidal.map, rhs: fmap, name: "Use fmap"}
+      - warn: {lhs: Data.Map.elems, rhs: toList, name: "Use toList"}
+      - warn: {lhs: Data.Map.Strict.elems, rhs: toList, name: "Use toList"}
+      - warn: {lhs: Data.Map.Monoidal.elems, rhs: toList, name: "Use toList"}
 
 # Built-in hints that contradict STYLE.md.
 #
@@ -204,7 +255,6 @@
 - arguments:
   - -XAllowAmbiguousTypes
   - -XApplicativeDo
-  - -XArrows
   - -XBangPatterns
   - -XBinaryLiterals
   - -XBlockArguments
