@@ -1,7 +1,25 @@
 { inputs ? (import ./inputs.nix)
 , system ? builtins.currentSystem
 , pkgs ? (import inputs.nixpkgs { inherit system; })
+, fourmoluSrc ?
+    if builtins.pathExists ./deps/fourmolu/thunk.nix
+      then import ./deps/fourmolu/thunk.nix
+      else ./deps/fourmolu
 }:
+
+let haskellPackages = pkgs.haskellPackages;
+
+    # The GHC 9.10 set's defaults for these two are older than the fork accepts.
+    fourmoluDeps = {
+      ghc-lib-parser = haskellPackages.ghc-lib-parser_9_14_1_20251220;
+      Cabal-syntax = haskellPackages.Cabal-syntax_3_16_1_0;
+    };
+
+    fourmoluPackage = pkgs.haskell.lib.compose.dontCheck
+      (haskellPackages.callCabal2nix "fourmolu" fourmoluSrc fourmoluDeps);
+
+    fourmolu = pkgs.haskell.lib.compose.justStaticExecutables fourmoluPackage;
+in
 
 pkgs.writeShellScriptBin "fourmolu" ''
   baseConfig=${./fourmolu.yaml}
@@ -32,8 +50,8 @@ pkgs.writeShellScriptBin "fourmolu" ''
     config=$(${pkgs.coreutils}/bin/mktemp)
     trap '${pkgs.coreutils}/bin/rm -f "$config"' EXIT
     ${pkgs.coreutils}/bin/cat - > "$config"
-    ${pkgs.lib.getExe pkgs.fourmolu} --config "$config" "''${args[@]}"
+    ${pkgs.lib.getExe fourmolu} --config "$config" "''${args[@]}"
   else
-    exec ${pkgs.lib.getExe pkgs.fourmolu} --config "$config" "''${args[@]}"
+    exec ${pkgs.lib.getExe fourmolu} --config "$config" "''${args[@]}"
   fi
 ''
