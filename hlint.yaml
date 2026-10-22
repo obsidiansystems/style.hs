@@ -123,7 +123,8 @@
     qualifiedStyle: post
     message: 'STYLE.md: post-qualified imports line the module names up in the same column. Needs ImportQualifiedPost, on by default since GHC 9.6.'
   - {name: Data.Text, as: T}
-  - {name: [Data.Map, Data.Map.Monoidal], as: Map}
+  - {name: Data.Map, as: Map}
+  - {name: Data.Map.Monoidal, as: MMap}
   - {name: Data.Set, as: Set}
   - {name: Data.ByteString, as: BS}
   - {name: Data.ByteString.Lazy, as: LBS}
