@@ -220,10 +220,6 @@ And these are out of reach. Use fourmolu, or your own discipline, for them:
 - `let`/`in` layout, haddock style, and the space inside record braces.
 - "One blank line, never two."
 - No newline before the `=` of a function definition.
-- Import *grouping*. The Obsidian External/Common/Frontend/Backend/Local ordering isn't
-  expressible: stylish-haskell emits groups in rule order with unmatched modules last,
-  and has no notion of which modules are local to your package. The config therefore
-  leaves your blank-line groups alone and only sorts within them.
 
 ## Where the two formatters differ
 
