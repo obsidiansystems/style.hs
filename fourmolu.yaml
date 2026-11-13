@@ -21,21 +21,3 @@ sort-deriving-clauses: true
 trailing-section-operators: true
 unicode: never
 respectful: true
-
-import-grouping:
-  - name: "External"
-    rules:
-      - match: all
-        priority: 100
-  - name: "Common"
-    rules:
-      - glob: Common.**
-  - name: "Frontend"
-    rules:
-      - glob: Frontend.**
-  - name: "Backend"
-    rules:
-      - glob: Backend.**
-  - name: "Local"
-    rules:
-      - match: local-modules
